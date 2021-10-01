@@ -59,7 +59,10 @@ interface IServerStatus {
 const getNewWorldStatusHtml = async (serverName: string): Promise<IServerStatus | null> => {
     try {
         const url = 'https://newworldstatus.com/';
-        const browser = await puppeteer.launch({headless: true});
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox','--disable-setuid-sandbox']
+        });
         const page = await browser.newPage();
         await page.goto(url);
         await page.waitForSelector('.text-end');
