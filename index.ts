@@ -65,7 +65,7 @@ const getNewWorldStatusHtml = async (serverName: string): Promise<IServerStatus 
         });
         const page = await browser.newPage();
         await page.goto(url);
-        await page.waitForSelector('.text-end', {timeout: 6000});
+        await page.waitForSelector('.text-end', {timeout: 12000});
         const stuff = await page.evaluate(() => {
             let rows: any[] = [];
             window.document.querySelectorAll("table#db76b9e516bd > tbody > tr").forEach(rowNode => {
