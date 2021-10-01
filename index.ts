@@ -86,7 +86,7 @@ const getNewWorldStatusHtml = async (serverName: string): Promise<IServerStatus 
             waitTime: myServer[6] as string
         } as IServerStatus
     } catch (e) {
-        console.error(e);
+        console.log(e);
         return null;
     }
 }
