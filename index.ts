@@ -80,7 +80,7 @@ async function apiRequest(serverName: string): Promise<INewWorldApiResponseData 
         }
     });
     if (!response.ok) {
-        console.log(response);
+        console.log(JSON.stringify(response));
         console.log(response.status);
         console.log(response.statusText);
         return null;
