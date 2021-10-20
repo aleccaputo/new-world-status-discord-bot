@@ -1,9 +1,10 @@
 import * as Discord from 'discord.js';
 import * as dotenv from 'dotenv';
-import puppeteer from 'puppeteer'
+import fetch from 'node-fetch';
 
 dotenv.config();
 
+const newWorldBearer = 'Bearer ' + process.env.NEW_WORLD_STATUS_API_KEY;
 const serverId = process.env.SERVER
 const client = new Discord.Client();
 
@@ -40,10 +41,10 @@ client.on('message', async (message) => {
         lastMessageTime = message.createdTimestamp;
         const {context, command} = parseServerCommand(message.content);
         if (command === 'stats' && context) {
-            message.channel.send(`Looking up stats for ${context}, this may take a while...`);
+            message.channel.send(`Looking up stats for ${context}...`);
             const stats = await getNewWorldStatusHtml(context);
             if (stats) {
-                message.channel.send(`Stats for ${stats.name}:\nQueue: ${stats.population} | Wait Time: ${stats.waitTime}`)
+                message.channel.send(`Stats for ${stats.name}:\nQueue: ${stats.queueLength}\nWait Time: ${stats.waitTime}\nCurrent Player Count: ${stats.population}`)
             } else {
                 message.channel.send(`Unable to retrieve server stats for ${context}`);
             }
@@ -51,40 +52,53 @@ client.on('message', async (message) => {
     }
 })
 
-interface IServerStatus {
-    population: string;
-    waitTime: string;
-    name: string;
+interface INewWorldApiResponseDataMessage {
+    players_current: number,
+    players_maximum: number,
+    queue_current: number,
+    queue_wait_time_minutes: number,
+    status_enum: string
 }
+interface INewWorldApiResponseData {
+    success: boolean,
+    via: string,
+    message: INewWorldApiResponseDataMessage
+}
+interface IServerStatus {
+    population: number;
+    waitTime: number;
+    name: string;
+    queueLength: number
+}
+
+async function apiRequest(serverName: string): Promise<INewWorldApiResponseData | null> {
+    const response = await fetch(`https://firstlight.newworldstatus.com/ext/v1/worlds/${serverName.toLowerCase()}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': newWorldBearer,
+            'Content-Type': 'application/json'
+        }
+    });
+    if (!response.ok) {
+        console.log(response.status);
+        console.log(response.statusText);
+        return null;
+    }
+   return response.json() as Promise<INewWorldApiResponseData>
+}
+
 const getNewWorldStatusHtml = async (serverName: string): Promise<IServerStatus | null> => {
     try {
-        const url = 'https://newworldstatus.com/';
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox','--disable-setuid-sandbox']
-        });
-        const page = await browser.newPage();
-        await page.setDefaultNavigationTimeout(0);
-        await page.goto(url, {waitUntil: 'networkidle0'});
-        await page.waitForSelector('.text-end', {timeout: 12000});
-        const stuff = await page.evaluate(() => {
-            let rows: any[] = [];
-            window.document.querySelectorAll("table#db76b9e516bd > tbody > tr").forEach(rowNode => {
-                const el: (string | null)[] = [];
-                rowNode.querySelectorAll('td').forEach(cell => el.push(cell.textContent));
-                rows.push(el)
-            })
-            return rows;
-        });
-        const myServer = stuff.find(x => x[1].toLocaleLowerCase() === serverName.toLocaleLowerCase());
-        console.log(myServer);
-        if (!myServer || !myServer.length) {
+        const data = await apiRequest(serverName);
+        if (!data?.success) {
+            console.log('data was returned but was not successful');
             return null;
         }
         return {
-            name: myServer[1] as string,
-            population: myServer[5] as string,
-            waitTime: myServer[6] as string
+            name: serverName,
+            population: data.message.players_current,
+            waitTime: data.message.queue_wait_time_minutes,
+            queueLength: data.message.queue_current
         } as IServerStatus
     } catch (e) {
         console.log(e);
