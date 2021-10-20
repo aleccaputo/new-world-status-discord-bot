@@ -80,6 +80,8 @@ async function apiRequest(serverName: string): Promise<INewWorldApiResponseData 
         }
     });
     if (!response.ok) {
+        const foo = await response.json();
+        console.log(foo);
         console.log(response);
         console.log(response.headers);
         console.log(response.url);
