@@ -92,6 +92,7 @@ const getNewWorldStatusHtml = async (serverName: string): Promise<IServerStatus 
         const data = await apiRequest(serverName);
         if (!data?.success) {
             console.log('data was returned but was not successful');
+            console.log(data);
             return null;
         }
         return {
