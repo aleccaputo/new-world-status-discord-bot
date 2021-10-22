@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 import fetch from 'node-fetch';
 
 dotenv.config();
+console.log('oh look im a server');
 
 const newWorldBearer = 'Bearer ' + process.env.NEW_WORLD_STATUS_API_KEY;
 const serverId = process.env.SERVER
@@ -30,6 +31,7 @@ let lastMessageTime: number | null = null
 const sec = 2; // Seconds to wait between messages.
 
 client.on('message', async (message) => {
+    console.log('got a message!');
     // don't respond to messages from self
     if (message.author.id === client.user?.id) {
         return;
