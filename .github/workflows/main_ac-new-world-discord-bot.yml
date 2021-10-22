@@ -53,4 +53,4 @@ jobs:
           app-name: 'ac-new-world-discord-bot'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3CDACC666C654441BAD78C83A8B745D8 }}
-          package: ./dist/index.js
+          package: .
