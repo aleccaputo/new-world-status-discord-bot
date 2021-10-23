@@ -30,7 +30,6 @@ let lastMessageTime: number | null = null
 const sec = 2; // Seconds to wait between messages.
 
 client.on('message', async (message) => {
-    console.log('got a message!');
     // don't respond to messages from self
     if (message.author.id === client.user?.id) {
         return;
@@ -81,6 +80,7 @@ async function apiRequest(serverName: string): Promise<INewWorldApiResponseData 
         }
     });
     if (!response.ok) {
+        // for potential api debugging, remove when resolved
         const foo = await response.text();
         console.log(foo);
         console.log(response);
