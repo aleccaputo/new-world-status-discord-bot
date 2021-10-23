@@ -3,7 +3,6 @@ import * as dotenv from 'dotenv';
 import fetch from 'node-fetch';
 
 dotenv.config();
-console.log('oh look im a server');
 
 const newWorldBearer = 'Bearer ' + process.env.NEW_WORLD_STATUS_API_KEY;
 const serverId = process.env.SERVER
@@ -74,7 +73,7 @@ interface IServerStatus {
 }
 
 async function apiRequest(serverName: string): Promise<INewWorldApiResponseData | null> {
-    const response = await fetch(`https://firstlight.newworldstatus.com/ext/v1/worlds/${serverName.toLowerCase()}`, {
+    const response = await fetch(`https://firstlight.aeternum.sbs/ext/v1/worlds/${serverName.toLowerCase()}`, {
         method: 'GET',
         headers: {
             'Authorization': newWorldBearer,
