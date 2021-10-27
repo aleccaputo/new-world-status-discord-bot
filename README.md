@@ -3,6 +3,9 @@ Create a discord command for new world server status. Powered by https://newworl
 
 Code that powers a simple discord bot that checks server stats for a given New World Server. 
 After setting up your discrod bot, send this message in a channel the bot exists:
+Current Commands:
+`!nw stats [serverName]`
+
 ```
 !nw stats Valhalla
 ```
